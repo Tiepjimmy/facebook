@@ -6,240 +6,85 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  schemas  = ["parking", "camera"]
-}
-//parking
-model Card {
-  id          Int       @id @default(autoincrement())
-  uid         String    @unique
-  status      String
-  realmId     Int?      @map("realm_id")
-  vehicleId   Int?      @map("vehicle_id")
-  createdDate DateTime  @default(now()) @map("created_date")
-  createdBy   String?   @map("created_by")
-  updatedDate DateTime? @map("updated_date")
-  updatedBy   String?   @map("updated_by")
-  deletedDate DateTime? @map("deleted_date")
-  deletedBy   String?   @map("deleted_by")
-  isDeleted   Boolean   @default(false) @map("is_deleted")
-  tickets     Ticket[]
-
-  @@map("Card")
-  @@schema("parking")
+  schemas  = ["facebook", "tiktok"]
 }
 
-model Ticket {
-  id           Int       @id @default(autoincrement())
-  cardId       Int?      @map("cardId")
-  checkinTime  DateTime? @map("checkinTime")
-  checkoutTime DateTime? @map("checkoutTime")
-  fee          Float?
-  status       String
-  realmId      Int?      @map("realm_id")
-  legacyCardId Int?      @map("card_id")
-  vehicleId    Int?      @map("vehicle_id")
-  parkingLotId Int?      @map("parking_lot_id")
-  slotId       Int?      @map("slot_id")
-  checkinAt    DateTime? @map("checkin_time")
-  checkoutAt   DateTime? @map("checkout_time")
-  createdDate  DateTime  @default(now()) @map("created_date")
-  createdBy    String?   @map("created_by")
-  updatedDate  DateTime? @map("updated_date")
-  updatedBy    String?   @map("updated_by")
-  deletedDate  DateTime? @map("deleted_date")
-  deletedBy    String?   @map("deleted_by")
-  isDeleted    Boolean   @default(false) @map("is_deleted")
-
-  card Card? @relation(fields: [cardId], references: [id])
-
-  @@map("Ticket")
-  @@schema("parking")
-}
-
-model Realm {
-  id          Int       @id @default(autoincrement())
-  realmId     Int?      @map("realm_id")
-  name        String?
-  code        String    @unique
-  createdDate DateTime  @default(now()) @map("created_date")
-  createdBy   String?   @map("created_by")
-  updatedDate DateTime? @map("updated_date")
-  updatedBy   String?   @map("updated_by")
-  deletedDate DateTime? @map("deleted_date")
-  deletedBy   String?   @map("deleted_by")
-  isDeleted   Boolean   @default(false) @map("is_deleted")
-
-  @@map("Realm")
-  @@schema("parking")
-}
 
 model User {
-  id            Int       @id @default(autoincrement())
-  fullname      String
-  username      String    @unique
-  password      String
-  role          String
-  status        String    @default("ACTIVE")
-  realmId       Int?      @map("realm_id")
-  lastLoginAt   DateTime? @map("last_login_at")
-  createdDate   DateTime  @default(now()) @map("created_date")
-  createdBy     String?   @map("created_by")
-  updatedDate   DateTime? @map("updated_date")
-  updatedBy     String?   @map("updated_by")
-  deletedDate   DateTime? @map("deleted_date")
-  deletedBy     String?   @map("deleted_by")
-  isDeleted     Boolean   @default(false) @map("is_deleted")
-
+  id          BigInt   @id @default(autoincrement())
+  email       String   @unique
+  password    String
+  role        String
+  startDate DateTime?
+  endDate DateTime?
+  status      Boolean @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  subscriptions UserSubscription[]
+  configs       FbOverrideConfig[]
+  logs UserLog[]
   @@map("User")
-  @@schema("parking")
+  @@schema("facebook")
 }
 
-model Customer {
-  id          Int       @id @default(autoincrement())
-  realmId     Int?      @map("realm_id")
-  name        String?
-  phone       String?
-  email       String?
-  createdDate DateTime  @default(now()) @map("created_date")
-  createdBy   String?   @map("created_by")
-  updatedDate DateTime? @map("updated_date")
-  updatedBy   String?   @map("updated_by")
-  deletedDate DateTime? @map("deleted_date")
-  deletedBy   String?   @map("deleted_by")
-  isDeleted   Boolean   @default(false) @map("is_deleted")
+model UserLog {
+   id BigInt @id @default(autoincrement())
 
-  @@map("Customer")
-  @@schema("parking")
+    userId BigInt
+
+    oldStartDate DateTime?
+    oldEndDate DateTime?
+
+    newStartDate DateTime?
+    newEndDate DateTime?
+
+    note String?
+
+    createdAt DateTime @default(now())
+
+    user  User @relation(fields: [userId], references: [id])
+
+    @@map("UserLog")
+    @@schema("facebook")
 }
 
-model Vehicle {
-  id          Int       @id @default(autoincrement())
-  realmId     Int?      @map("realm_id")
-  plateNumber String    @unique @map("plate_number")
-  color       String?
-  type        String
-  customerId  Int?      @map("customer_id")
-  createdDate DateTime  @default(now()) @map("created_date")
-  createdBy   String?   @map("created_by")
-  updatedDate DateTime? @map("updated_date")
-  updatedBy   String?   @map("updated_by")
-  deletedDate DateTime? @map("deleted_date")
-  deletedBy   String?   @map("deleted_by")
-  isDeleted   Boolean   @default(false) @map("is_deleted")
+model Plan {
+  id            BigInt @id @default(autoincrement())
 
-  @@map("Vehicle")
-  @@schema("parking")
+  name          String
+  durationDays  Int
+  price         BigInt
+  createdAt     DateTime @default(now())
+  subscriptions UserSubscription[]
+  @@map("Plan")
+  @@schema("facebook")
 }
 
-model Transaction {
-  id          Int       @id @default(autoincrement())
-  realmId     Int?      @map("realm_id")
-  ticketId    Int?      @map("ticket_id")
-  amount      Float?
-  paymentType String?   @map("payment_type")
-  paidAt      DateTime? @map("paid_at")
-  createdDate DateTime  @default(now()) @map("created_date")
-  createdBy   String?   @map("created_by")
-  updatedDate DateTime? @map("updated_date")
-  updatedBy   String?   @map("updated_by")
-  deletedDate DateTime? @map("deleted_date")
-  deletedBy   String?   @map("deleted_by")
-  isDeleted   Boolean   @default(false) @map("is_deleted")
+model UserSubscription {
+  id          BigInt @id @default(autoincrement())
+  userId      BigInt
+  planId      BigInt
+  startDate   DateTime
+  endDate     DateTime
+  status      Boolean @default(true)
+  createdAt   DateTime @default(now())
+  user        User @relation(fields: [userId], references: [id])
+  plan        Plan @relation(fields: [planId], references: [id])
 
-  @@map("Transaction")
-  @@schema("parking")
+  @@map("UserSubscription")
+  @@schema("facebook")
 }
 
-model ParkingLot {
-  id          Int       @id @default(autoincrement())
-  realmId     Int?      @map("realm_id")
-  name        String
-  location    String?
-  capacity    Int?
-  createdDate DateTime  @default(now()) @map("created_date")
-  createdBy   String?   @map("created_by")
-  updatedDate DateTime? @map("updated_date")
-  updatedBy   String?   @map("updated_by")
-  deletedDate DateTime? @map("deleted_date")
-  deletedBy   String?   @map("deleted_by")
-  isDeleted   Boolean   @default(false) @map("is_deleted")
-
-  @@map("ParkingLot")
-  @@schema("parking")
-}
-
-model ParkingSlot {
-  id          Int       @id @default(autoincrement())
-  realmId     Int?      @map("realm_id")
-  lotId       Int?      @map("lot_id")
-  slotCode    String    @map("slot_code")
-  status      String
-  createdDate DateTime  @default(now()) @map("created_date")
-  createdBy   String?   @map("created_by")
-  updatedDate DateTime? @map("updated_date")
-  updatedBy   String?   @map("updated_by")
-  deletedDate DateTime? @map("deleted_date")
-  deletedBy   String?   @map("deleted_by")
-  isDeleted   Boolean   @default(false) @map("is_deleted")
-
-  @@map("ParkingSlot")
-  @@schema("parking")
-}
-
-model ParkingPrice {
-  id             Int       @id @default(autoincrement())
-  vehicleType    String?   @map("vehicle_type")
-  firstHourPrice Float?    @map("first_hour_price")
-  nextHourPrice  Float?    @map("next_hour_price")
-  maxPricePerDay Float?    @map("max_price_per_day")
-  realmId        Int?      @map("realm_id")
-  createdDate    DateTime  @default(now()) @map("created_date")
-  createdBy      String?   @map("created_by")
-  updatedDate    DateTime? @map("updated_date")
-  updatedBy      String?   @map("updated_by")
-  deletedDate    DateTime? @map("deleted_date")
-  deletedBy      String?   @map("deleted_by")
-  isDeleted      Boolean   @default(false) @map("is_deleted")
-
-  @@map("ParkingPrice")
-  @@schema("parking")
-}
-
-model Subscription {
-  id          Int       @id @default(autoincrement())
-  cardId      Int?      @map("card_id")
-  vehicleId   Int?      @map("vehicle_id")
-  startDate   DateTime? @map("start_date")
-  endDate     DateTime? @map("end_date")
-  status      String?
-  realmId     Int?      @map("realm_id")
-  createdDate DateTime  @default(now()) @map("created_date")
-  createdBy   String?   @map("created_by")
-  updatedDate DateTime? @map("updated_date")
-  updatedBy   String?   @map("updated_by")
-  deletedDate DateTime? @map("deleted_date")
-  deletedBy   String?   @map("deleted_by")
-  isDeleted   Boolean   @default(false) @map("is_deleted")
-
-  @@map("Subscription")
-  @@schema("parking")
-}
-
-model CameraLog {
-  id          Int       @id @default(autoincrement())
-  realmId     Int?      @map("realm_id")
-  ticketId    Int?      @map("ticket_id")
-  imageUrl    String?   @map("image_url")
-  type        String
-  capturedAt  DateTime? @map("captured_at")
-  createdDate DateTime  @default(now()) @map("created_date")
-  createdBy   String?   @map("created_by")
-  updatedDate DateTime? @map("updated_date")
-  updatedBy   String?   @map("updated_by")
-  deletedDate DateTime? @map("deleted_date")
-  deletedBy   String?   @map("deleted_by")
-  isDeleted   Boolean   @default(false) @map("is_deleted")
-
-  @@map("CameraLog")
-  @@schema("parking")
+model FbOverrideConfig {
+  id              BigInt @id @default(autoincrement())
+  userId          BigInt
+  rowIndex        Int
+  clickValue      Int
+  pricePerClick   BigInt
+  isActive        Boolean @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  user            User @relation(fields: [userId], references: [id])
+  @@map("FbOverrideConfig")
+  @@schema("facebook")
 }

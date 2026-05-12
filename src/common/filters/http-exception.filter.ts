@@ -24,7 +24,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
     switch (status) {
       case HttpStatus.BAD_REQUEST:
         statusCode = '400';
-        message = 'Bad request';
         break;
       case HttpStatus.UNAUTHORIZED:
         statusCode = '401';
@@ -43,7 +42,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
         message = 'Conflict';
         break;
       case HttpStatus.INTERNAL_SERVER_ERROR:
-        statusCode = '99';
         message = 'Internal server error';
         break;
     }
