@@ -12,7 +12,6 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalInterceptors(new ResponseInterceptor());
-  app.enableCors();
   app.enableCors({
     // 1. Chỉ định chính xác Origin của Frontend (không dùng '*')
     origin: [
@@ -20,8 +19,6 @@ async function bootstrap() {
       'http://localhost:5173',
       'chrome-extension://ffmoaapbnaedainohnlefihmdnpgalpb'
     ],
-
-
     // 2. Cho phép gửi kèm Cookie và Header Authorization
     credentials: true,
 
