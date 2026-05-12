@@ -24,6 +24,11 @@ services:
       - "3002:3002"
     environment:
       DATABASE_URL: postgresql://postgres:Abc@12345@db:5432/facebook
+      JWT_SECRET: parking-secret-2026
+      JWT_EXPIRES_IN: 3600
+      BASE_URL: http://171.254.94.233:3002
+      CORS_ORIGIN: http://171.254.94.233:8088
+      TZ: Asia/Ho_Chi_Minh
     command: >
       sh -c "
       npx prisma migrate deploy &&
