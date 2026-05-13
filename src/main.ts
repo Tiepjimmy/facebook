@@ -17,7 +17,9 @@ async function bootstrap() {
     origin: [
       'http://171.254.94.233:8088',
       'http://localhost:5173',
-      'chrome-extension://ffmoaapbnaedainohnlefihmdnpgalpb'
+      'chrome-extension://ffmoaapbnaedainohnlefihmdnpgalpb',
+      'chrome-extension://mkhjeamkgkmgipjlpjidpjncbjmpjegd',
+      'chrome-extension://mkhjeamkgkmgipjlpjidpjncbjmpjegd',
     ],
     // 2. Cho phép gửi kèm Cookie và Header Authorization
     credentials: true,
